@@ -1,0 +1,94 @@
+# ============================================
+# Air Configuration для E-Commerce проєкту
+# https://github.com/air-verse/air
+# ============================================
+
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  # Аргументи для запуску додатка
+  args_bin = []
+  
+  # Бінарний файл після збірки
+  bin = "./tmp/main"
+  
+  # Команда збірки
+  cmd = "go build -o ./tmp/main ."
+  
+  # Затримка після детекції зміни файлу (мілісекунди)
+  delay = 1000
+  
+  # Директорії для виключення зі спостереження
+  exclude_dir = [
+    "assets",
+    "tmp",
+    "vendor",
+    "testdata",
+    "migrations",
+    "docs",
+    "scripts",
+    ".git",
+    ".github"
+  ]
+  
+  # Файли для виключення
+  exclude_file = []
+  
+  # Регулярні вирази для виключення
+  exclude_regex = ["_test\\.go", "_mock\\.go"]
+  
+  # Не перезапускати, якщо файл не змінився
+  exclude_unchanged = true
+  
+  # Розширення файлів для відстеження
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  
+  # Додаткові директорії для відстеження (за замовчуванням всі)
+  include_dir = []
+  
+  # Файли для відстеження (регулярні вирази)
+  include_file = []
+  
+  # Відстежувати символічні посилання
+  follow_symlink = false
+  
+  # Записати build лог у файл
+  full_bin = ""
+  
+  # Лог файл для збірки
+  log = "build-errors.log"
+  
+  # Додати задержку перед перезапуском (мілісекунди)
+  poll = false
+  poll_interval = 0
+  
+  # Час очікування після SIGKILL (мілісекунди)
+  post_cmd = []
+  
+  # Виконати перед збіркою
+  pre_cmd = []
+  
+  # Перезапустити при зміні, навіть якщо збірка не вдалась
+  rerun = false
+  
+  # Затримка перед перезапуском (мілісекунди)
+  rerun_delay = 500
+  
+  # Відправити переривання перед SIGKILL
+  send_interrupt = false
+  
+  # Зупинити при помилці збірки
+  stop_on_error = true
+
+[color]
+  # Кольори для різних типів виводу
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  # Показува

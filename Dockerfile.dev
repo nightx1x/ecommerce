@@ -1,0 +1,25 @@
+# ============================================
+# Development з Air hot-reload
+# ============================================
+FROM golang:1.24.2-alpine
+
+# Встановлюємо необхідні пакети
+RUN apk add --no-cache git make
+
+# Встановлюємо Air для hot-reload
+RUN go install github.com/air-verse/air@v1.52.3
+
+WORKDIR /app
+
+# Копіюємо файли залежностей
+COPY go.mod ./
+RUN go mod download
+
+# Копіюємо весь код
+COPY . .
+
+# Відкриваємо порт
+EXPOSE 8080
+
+# Запускаємо Air для hot-reload
+CMD ["air", "-c", ".air.toml"]
