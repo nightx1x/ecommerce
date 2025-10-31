@@ -180,7 +180,7 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
-	updProd, err := h.ProductSrv.UpdateProducts(r.Context(), id, req)
+	updProd, err := h.ProductSrv.UpdateProduct(r.Context(), id, req)
 	if err != nil {
 		handlerServiceError(w, err)
 		return
