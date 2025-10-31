@@ -25,12 +25,38 @@ type productRepo struct {
 
 // Create implements ProductRepository.
 func (p *productRepo) Create(ctx context.Context, product *models.Product) error {
-	panic("unimplemented")
+	query := `
+		INSERT INTO products (id, name, description, price, stock, category_id, image_url, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	`
+	_, err := p.db.ExecContext(ctx, query,
+		product.ID,
+		product.Name,
+		product.Description,
+		product.Price,
+		product.Stock,
+		product.CategoryID,
+		product.ImageURL,
+		product.CreatedAt,
+		product.UpdatedAt,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create product: %w", err)
+	}
+	return nil
 }
 
 // Delete implements ProductRepository.
 func (p *productRepo) Delete(ctx context.Context, id uuid.UUID) error {
-	panic("unimplemented")
+	query := `
+		DELETE FROM products
+		WHERE id = $1
+	`
+	_, err := p.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete product: %w", err)
+	}
+	return nil
 }
 
 // GetByID implements ProductRepository.
@@ -123,12 +149,30 @@ func (p *productRepo) List(ctx context.Context, filter *models.ListFilter) ([]*m
 
 // Update implements ProductRepository.
 func (p *productRepo) Update(ctx context.Context, id uuid.UUID) error {
-	panic("unimplemented")
+	query := `
+		UPDATE products
+		SET updated_at = NOW()
+		WHERE id = $1
+	`
+	_, err := p.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to update product: %w", err)
+	}
+	return nil
 }
 
 // UpdateStock implements ProductRepository.
 func (p *productRepo) UpdateStock(ctx context.Context, id uuid.UUID, quantity int) error {
-	panic("unimplemented")
+	query := `
+		UPDATE products
+		SET stock = stock + $1, updated_at = NOW()
+		WHERE id = $2
+	`
+	_, err := p.db.ExecContext(ctx, query, quantity, id)
+	if err != nil {
+		return fmt.Errorf("failed to update product stock: %w", err)
+	}
+	return nil
 }
 
 func NewProductRepository(db *database.DB) ProductRepository {

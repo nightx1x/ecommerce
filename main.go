@@ -10,6 +10,7 @@ import (
 	database "github.com/nightx1x/ecommerce/interval/db"
 	models "github.com/nightx1x/ecommerce/interval/domain"
 	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	services "github.com/nightx1x/ecommerce/interval/service/product"
 )
 
 func getEnv(key, defaultValue string) string {
@@ -63,6 +64,9 @@ func main() {
 
 	// Репозиторій продуктів
 	productRepo := repository.NewProductRepository(db)
+
+	productSrv := services.NewService(productRepo)
+
 	ctx := context.Background()
 
 	// Виведення списку товарів
