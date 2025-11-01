@@ -12,7 +12,7 @@ import (
 type OrderRepository interface {
 	Create(ctx context.Context, order *models.Order) error
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Order, error)
-	List(ctx context.Context, filter OrderFilter) ([]*models.Order, error)
+	List(ctx context.Context, filter *models.OrderFilter) ([]*models.Order, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 	Cancel(ctx context.Context, id uuid.UUID) error
 }
@@ -30,7 +30,6 @@ func (o *orderRepo) Create(ctx context.Context, order *models.Order) error {
 		order.ID,
 		order.UserID,
 		order.Items,
-		order.TotalAmount,
 		order.Status,
 		order.CreatedAt,
 		order.UpdatedAt,
@@ -68,7 +67,6 @@ func (o *orderRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.Order, e
 		&order.ID,
 		&order.UserID,
 		&order.Items,
-		&order.TotalAmount,
 		&order.Status,
 		&order.CreatedAt,
 		&order.UpdatedAt,
@@ -80,7 +78,7 @@ func (o *orderRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.Order, e
 }
 
 // List implements OrderRepository.
-func (o *orderRepo) List(ctx context.Context, filter OrderFilter) ([]*models.Order, error) {
+func (o *orderRepo) List(ctx context.Context, filter *models.OrderFilter) ([]*models.Order, error) {
 	query := `
 		SELECT id, user_id, items, total_amount, status, created_at, updated_at
 		FROM orders
@@ -104,7 +102,6 @@ func (o *orderRepo) List(ctx context.Context, filter OrderFilter) ([]*models.Ord
 			&order.ID,
 			&order.UserID,
 			&order.Items,
-			&order.TotalAmount,
 			&order.Status,
 			&order.CreatedAt,
 			&order.UpdatedAt,

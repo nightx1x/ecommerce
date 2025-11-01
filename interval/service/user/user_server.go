@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	models "github.com/nightx1x/ecommerce/interval/domain"
 	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
 )
 
 type UserService interface {
 	CreateUser(ctx context.Context, email, password string) (uuid.UUID, error)
-	GetUserByID(ctx context.Context, id uuid.UUID) (*User, error)
-	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	UpdateUser(ctx context.Context, id uuid.UUID, email, password string) error
 	DeleteUser(ctx context.Context, id uuid.UUID) error
 }
@@ -34,12 +35,12 @@ func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 // GetUserByEmail implements UserService.
-func (s *service) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+func (s *service) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	panic("unimplemented")
 }
 
 // GetUserByID implements UserService.
-func (s *service) GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+func (s *service) GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	panic("unimplemented")
 }
 
