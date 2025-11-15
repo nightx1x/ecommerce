@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	database "github.com/nightx1x/ecommerce/interval/db"
-	models "github.com/nightx1x/ecommerce/interval/domain"
+	database "github.com/nightx1x/ecommerce/internal/db"
+	models "github.com/nightx1x/ecommerce/internal/domain"
 )
 
 type OrderRepository interface {
@@ -27,7 +27,7 @@ func NewOrderRepository(db *database.DB) OrderRepository {
 	return &orderRepo{db: db}
 }
 
-// Create створення нового замовлення
+// Create new order
 func (o *orderRepo) Create(ctx context.Context, order *models.Order, items []*models.OrderItem) error {
 
 	orderQuery := `
@@ -68,7 +68,7 @@ func (o *orderRepo) Create(ctx context.Context, order *models.Order, items []*mo
 	return nil
 }
 
-// GetById повертає замовлення по ID
+// GetById returns order by ID
 func (o *orderRepo) GetById(ctx context.Context, id uuid.UUID) (*models.Order, error) {
 	var order models.Order
 
@@ -105,7 +105,7 @@ func (o *orderRepo) GetById(ctx context.Context, id uuid.UUID) (*models.Order, e
 	return &order, nil
 }
 
-// GetOrderItems повертає товари в Замовленні по ID
+// GetOrderItems returns items of the order
 func (o *orderRepo) GetOrderItems(ctx context.Context, orderID uuid.UUID) ([]*models.OrderItem, error) {
 	var items []*models.OrderItem
 
@@ -124,7 +124,7 @@ func (o *orderRepo) GetOrderItems(ctx context.Context, orderID uuid.UUID) ([]*mo
 	return items, nil
 }
 
-// ListAll повертає всі замовлення
+// ListAll returns all orders
 func (o *orderRepo) ListAll(ctx context.Context, limit int, offset int) ([]*models.Order, error) {
 	query := `
 	SELECT id, user_id, status, total_amount, shipping_address, payment_method, created_at, updated_at
@@ -167,7 +167,7 @@ func (o *orderRepo) ListAll(ctx context.Context, limit int, offset int) ([]*mode
 	return orders, nil
 }
 
-// ListByUserID повертає замовлення по ID користувача
+// ListByUserID returns orders by user ID
 func (o *orderRepo) ListByUserID(ctx context.Context, userID uuid.UUID, limit int, offset int) ([]*models.Order, error) {
 	query := `
 	SELECT id, user_id, status, total_amount, shipping_address, payment_method, created_at, updated_at
@@ -211,7 +211,7 @@ func (o *orderRepo) ListByUserID(ctx context.Context, userID uuid.UUID, limit in
 	return orders, nil
 }
 
-// UpdateStatus оновлення статусу замовлення
+// UpdateStatus updates the status of an order
 func (o *orderRepo) UpdateStatus(ctx context.Context, id uuid.UUID, status string) error {
 	query := `
 	UPDATE orders

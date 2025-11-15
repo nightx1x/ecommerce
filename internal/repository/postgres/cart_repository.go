@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
-	database "github.com/nightx1x/ecommerce/interval/db"
-	models "github.com/nightx1x/ecommerce/interval/domain"
+	database "github.com/nightx1x/ecommerce/internal/db"
+	models "github.com/nightx1x/ecommerce/internal/domain"
 )
 
 type CartRepository interface {
@@ -30,7 +30,7 @@ func NewCartRepository(db *database.DB) CartRepository {
 	return &CartRepo{db: db}
 }
 
-// AddItem додавання товарів у кошик
+// AddItem
 func (c *CartRepo) AddItem(ctx context.Context, item *models.Cart) error {
 	query := `
 	INSERT INTO cart_items (id, user_id, product_id, quantity, created_at)
@@ -49,7 +49,7 @@ func (c *CartRepo) AddItem(ctx context.Context, item *models.Cart) error {
 	return nil
 }
 
-// Clear очищення кошику
+// Clear
 func (c *CartRepo) Clear(ctx context.Context, userId uuid.UUID) error {
 	query := `
 	DELETE FROM cart_items WHERE user_id = $1
@@ -63,7 +63,7 @@ func (c *CartRepo) Clear(ctx context.Context, userId uuid.UUID) error {
 	return nil
 }
 
-// GetByUserId повертає кошик за ID користувача
+// GetByUserId
 func (c *CartRepo) GetByUserId(ctx context.Context, userID uuid.UUID) ([]*models.CartWithProduct, error) {
 	var items []*models.CartWithProduct
 
@@ -89,7 +89,7 @@ func (c *CartRepo) GetByUserId(ctx context.Context, userID uuid.UUID) ([]*models
 	return items, nil
 }
 
-// GetItemByID повертає товар в кошику по його ID
+// GetItemByID
 func (c *CartRepo) GetItemByID(ctx context.Context, userID, itemID uuid.UUID) (*models.Cart, error) {
 	var item models.Cart
 	query := `
@@ -108,7 +108,7 @@ func (c *CartRepo) GetItemByID(ctx context.Context, userID, itemID uuid.UUID) (*
 	return &item, nil
 }
 
-// GetItem получення товару
+// GetItem
 func (c *CartRepo) GetItem(ctx context.Context, userId uuid.UUID, productId uuid.UUID) (*models.Cart, error) {
 	var item models.Cart
 	query := `
@@ -127,7 +127,7 @@ func (c *CartRepo) GetItem(ctx context.Context, userId uuid.UUID, productId uuid
 	return &item, nil
 }
 
-// RemoveItem видалення товару з кошика
+// RemoveItem
 func (c *CartRepo) RemoveItem(ctx context.Context, userID, id uuid.UUID) error {
 	query := `
 	DELETE FROM cart_items
@@ -147,7 +147,7 @@ func (c *CartRepo) RemoveItem(ctx context.Context, userID, id uuid.UUID) error {
 	return nil
 }
 
-// UpdateQuantity оновлення кількість товару в кошику
+// UpdateQuantity
 func (c *CartRepo) UpdateQuantity(ctx context.Context, id uuid.UUID, quantity int) error {
 	query := `
 	UPDATE cart_items

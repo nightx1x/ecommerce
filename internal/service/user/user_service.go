@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
-	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	models "github.com/nightx1x/ecommerce/internal/domain"
+	repository "github.com/nightx1x/ecommerce/internal/repository/postgres"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -54,7 +54,7 @@ func NewService(userRepo repository.UserRepository) UserService {
 	return &service{userRepo: userRepo}
 }
 
-// DeleteUser видалення користувача
+// DeleteUser
 func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
 
 	_, err := s.userRepo.GetByID(ctx, id)
@@ -69,7 +69,7 @@ func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// GetUser отримання користувача
+// GetUser
 func (s *service) GetUser(ctx context.Context, id uuid.UUID) (*models.User, error) {
 
 	if id == uuid.Nil {
@@ -84,7 +84,7 @@ func (s *service) GetUser(ctx context.Context, id uuid.UUID) (*models.User, erro
 	return user, nil
 }
 
-// ListUser повертаж список користувачів
+// ListUser
 func (s *service) ListUser(ctx context.Context, filter UserFilter) (*UserListResponse, error) {
 
 	if filter.Limit <= 0 {
@@ -123,7 +123,7 @@ func (s *service) ListUser(ctx context.Context, filter UserFilter) (*UserListRes
 	return resp, nil
 }
 
-// UpdateUser новлення данних користувача
+// UpdateUser
 func (s *service) UpdateUser(ctx context.Context, id uuid.UUID, req UpdateUserRequest, isAdmin bool) (*models.User, error) {
 
 	user, err := s.userRepo.GetByID(ctx, id)

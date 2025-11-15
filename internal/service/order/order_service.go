@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
-	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	models "github.com/nightx1x/ecommerce/internal/domain"
+	repository "github.com/nightx1x/ecommerce/internal/repository/postgres"
 )
 
 type OrderService interface {
@@ -55,7 +55,7 @@ func NewService(orderRepo repository.OrderRepository, productRepo repository.Pro
 		productRepo: productRepo}
 }
 
-// CancelOrder скасування замовлення
+// CancelOrder
 func (s *service) CancelOrder(ctx context.Context, id uuid.UUID) error {
 
 	if id == uuid.Nil {
@@ -81,7 +81,7 @@ func (s *service) CancelOrder(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// CreateOrder створення замовлення
+// CreateOrder
 func (s *service) CreateOrder(ctx context.Context, userID uuid.UUID, req CreateOrderRequest) (*models.Order, error) {
 
 	if userID == uuid.Nil {
@@ -132,7 +132,7 @@ func (s *service) CreateOrder(ctx context.Context, userID uuid.UUID, req CreateO
 	return order, nil
 }
 
-// GetOrder отримання замовлення
+// GetOrder
 func (s *service) GetOrder(ctx context.Context, id uuid.UUID) (*models.Order, error) {
 
 	if id == uuid.Nil {
@@ -147,7 +147,7 @@ func (s *service) GetOrder(ctx context.Context, id uuid.UUID) (*models.Order, er
 	return order, nil
 }
 
-// ListOrder повертає список замовлень
+// ListOrder
 func (s *service) ListOrder(ctx context.Context, filter OrderFilter) (*OrderListResponse, error) {
 
 	if filter.Limit <= 0 {
@@ -190,7 +190,7 @@ func (s *service) ListOrder(ctx context.Context, filter OrderFilter) (*OrderList
 	return resp, nil
 }
 
-// UpdateOrderStatus оновлення статусу замовлення
+// UpdateOrderStatus
 func (s *service) UpdateOrderStatus(ctx context.Context, id uuid.UUID, req UpdateOrderRequest) (*models.Order, error) {
 
 	if id == uuid.Nil {

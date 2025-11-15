@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	authService "github.com/nightx1x/ecommerce/interval/service/auth"
+	authService "github.com/nightx1x/ecommerce/internal/service/auth"
 )
 
 type contextKey string

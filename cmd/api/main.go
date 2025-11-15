@@ -10,20 +10,20 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/nightx1x/ecommerce/interval/db"
+	"github.com/nightx1x/ecommerce/internal/db"
 
-	httpHandler "github.com/nightx1x/ecommerce/interval/handler/http"
-	postgres "github.com/nightx1x/ecommerce/interval/repository/postgres"
-	authService "github.com/nightx1x/ecommerce/interval/service/auth"
-	cartService "github.com/nightx1x/ecommerce/interval/service/cart"
-	orderService "github.com/nightx1x/ecommerce/interval/service/order"
-	productService "github.com/nightx1x/ecommerce/interval/service/product"
-	userService "github.com/nightx1x/ecommerce/interval/service/user"
+	httpHandler "github.com/nightx1x/ecommerce/internal/handler/http"
+	postgres "github.com/nightx1x/ecommerce/internal/repository/postgres"
+	authService "github.com/nightx1x/ecommerce/internal/service/auth"
+	cartService "github.com/nightx1x/ecommerce/internal/service/cart"
+	orderService "github.com/nightx1x/ecommerce/internal/service/order"
+	productService "github.com/nightx1x/ecommerce/internal/service/product"
+	userService "github.com/nightx1x/ecommerce/internal/service/user"
 )
 
 // @title E-Commerce API
 // @version 1.0
-// @description API для e-commerce платформи з управлінням продуктами, кошиком та замовленнями
+// @description API for an e-commerce platform with product, cart, and order management
 // @host localhost:8080
 // @BasePath /api/v1
 // @securityDefinitions.apikey BearerAuth
@@ -31,12 +31,12 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	// завантаження .env файлів
+	// loading .env files
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using environment varibles")
+		log.Println("No .env file found, using environment variables")
 	}
 
-	// отримання конфігурації з env
+	// reading configuration from env
 	dbHost := getEnv("DB_HOST", "db")
 	dbPort := getEnv("DB_PORT", "5432")
 	dbUser := getEnv("DB_USER", "user")
@@ -46,7 +46,7 @@ func main() {
 	serverPort := getEnv("APP_PORT", "8080")
 	jwtSecret := getEnv("JWT_SECRET", "kfJ+JpWThVtZ5p0hIM9s7jFGucNvHdn59aTfzT7fQ2iqlt3rH2bnSKTwsm4B3Q3P")
 
-	// конфігурація бази данних
+	// database configuration
 	dbConfig := db.Config{
 		Host:     dbHost,
 		Port:     dbPort,
@@ -56,24 +56,24 @@ func main() {
 		SSLMode:  dbSSLMode,
 	}
 
-	// ініціалізація бази данних
+	// initializing the database
 	database, err := db.NewDB(dbConfig)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer database.Close()
 
-	log.Println("✅ Database connetion established")
+	log.Println("✅ Database connection established")
 
-	// ініціалізація репозеторіїв
+	// initializing repositories
 	productRepo := postgres.NewProductRepository(database)
 	userRepo := postgres.NewUserRepository(database)
 	cartRepo := postgres.NewCartRepository(database)
 	orderRepo := postgres.NewOrderRepository(database)
 
-	log.Println("✅ Repository initialized")
+	log.Println("✅ Repositories initialized")
 
-	// ініціалізація сервісів
+	// initializing services
 	productSrv := productService.NewService(productRepo)
 	userSrv := userService.NewService(userRepo)
 	authSrv := authService.NewService(userRepo, jwtSecret)
@@ -82,7 +82,7 @@ func main() {
 
 	log.Println("✅ Services initialized")
 
-	// ініціалізація http router
+	// initializing HTTP router
 	router := httpHandler.NewRouter(httpHandler.RouterConfig{
 		AuthService:    authSrv,
 		ProductService: productSrv,
@@ -93,7 +93,7 @@ func main() {
 
 	log.Println("✅ HTTP router initialized")
 
-	// створення HTTP серверу
+	// creating HTTP server
 	server := &http.Server{
 		Addr:         ":" + serverPort,
 		Handler:      router,
@@ -102,7 +102,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// запуск сервера в горутинах
+	// starting the server in a goroutine
 	go func() {
 		log.Printf("🚀 Server starting on http://localhost:%s", serverPort)
 		log.Printf("📚 API documentation: http://localhost:%s/api/v1", serverPort)
@@ -112,7 +112,7 @@ func main() {
 		}
 	}()
 
-	// повернення повідомлення про shutdowb
+	// waiting for shutdown signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

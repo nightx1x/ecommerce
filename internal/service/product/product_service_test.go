@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
+	models "github.com/nightx1x/ecommerce/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

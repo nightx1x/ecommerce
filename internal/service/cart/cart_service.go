@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
-	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	models "github.com/nightx1x/ecommerce/internal/domain"
+	repository "github.com/nightx1x/ecommerce/internal/repository/postgres"
 )
 
 type CartService interface {
@@ -40,7 +40,7 @@ func NewService(cartRepo repository.CartRepository) CartService {
 	return &service{CartRepo: cartRepo}
 }
 
-// AddItem додавання товару в кошик
+// AddItem
 func (s *service) AddItem(ctx context.Context, userID uuid.UUID, req AddCartItemRequest) (*models.Cart, error) {
 
 	if req.ProductID == uuid.Nil {
@@ -78,7 +78,7 @@ func (s *service) AddItem(ctx context.Context, userID uuid.UUID, req AddCartItem
 	return item, nil
 }
 
-// ClearItem очищення кошику
+// ClearItem
 func (s *service) ClearItem(ctx context.Context, userID uuid.UUID) error {
 
 	if userID == uuid.Nil {
@@ -91,7 +91,7 @@ func (s *service) ClearItem(ctx context.Context, userID uuid.UUID) error {
 	return nil
 }
 
-// DeleteItem видалення товару з кошика
+// DeleteItem
 func (s *service) DeleteItem(ctx context.Context, userID uuid.UUID, itemID uuid.UUID) error {
 	if userID == uuid.Nil {
 		return ErrUserIDRequired
@@ -115,7 +115,7 @@ func (s *service) DeleteItem(ctx context.Context, userID uuid.UUID, itemID uuid.
 	return nil
 }
 
-// ListItem повененя списку товару у кошику
+// ListItem
 func (s *service) ListItem(ctx context.Context, userID uuid.UUID) (*CartListResponse, error) {
 
 	items, err := s.CartRepo.GetByUserId(ctx, userID)
@@ -142,7 +142,7 @@ func (s *service) ListItem(ctx context.Context, userID uuid.UUID) (*CartListResp
 	return resp, nil
 }
 
-// UpdateItem оновлення товару в кошику
+// UpdateItem
 func (s *service) UpdateItem(ctx context.Context, userID uuid.UUID, itemID uuid.UUID, req UpdateCartItemRequest) (*models.Cart, error) {
 
 	if userID == uuid.Nil {

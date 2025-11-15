@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	userSrv "github.com/nightx1x/ecommerce/interval/service/user"
+	userSrv "github.com/nightx1x/ecommerce/internal/service/user"
 )
 
 type UserHandler struct {
@@ -25,8 +25,8 @@ func (h *UserHandler) RegisterRoutes(r chi.Router) {
 }
 
 // ListUser godoc
-// @Summary Отримати інформацію про користувача
-// @Description Повертає дані користувача, який авторизований
+// @Summary Get user information
+// @Description Returns data of the authenticated user
 // @Tags users
 // @Accept json
 // @Produce json
@@ -53,12 +53,12 @@ func (h *UserHandler) ListUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateUser godoc
-// @Summary Оновити дані користувача
-// @Description Оновлює дані користувача (email, пароль, ім'я, прізвище, роль)
+// @Summary Update user data
+// @Description Updates user data (email, password, first name, last name, role)
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body user.UpdateOwnUserRequest true "Дані для оновлення користувача"
+// @Param user body user.UpdateOwnUserRequest true "Data for updating user"
 // @Success 200 {object} models.User
 // @Failure 400 {object} http.ErrorResponse "Invalid request body or invalid fields"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
@@ -96,7 +96,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, updUser)
 }
 
-// handlerServiceUserError повертає помилки
+// handlerServiceUserError returns service errors
 func handlerServiceUserError(w http.ResponseWriter, err error) {
 	switch err {
 	case userSrv.ErrUserNotFound:

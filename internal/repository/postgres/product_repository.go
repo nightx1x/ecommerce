@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	database "github.com/nightx1x/ecommerce/interval/db"
-	models "github.com/nightx1x/ecommerce/interval/domain"
+	database "github.com/nightx1x/ecommerce/internal/db"
+	models "github.com/nightx1x/ecommerce/internal/domain"
 )
 
 type ProductRepository interface {

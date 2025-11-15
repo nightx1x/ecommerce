@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	database "github.com/nightx1x/ecommerce/interval/db"
-	models "github.com/nightx1x/ecommerce/interval/domain"
+	database "github.com/nightx1x/ecommerce/internal/db"
+	models "github.com/nightx1x/ecommerce/internal/domain"
 )
 
 type UserRepository interface {
@@ -27,7 +27,7 @@ func NewUserRepository(db *database.DB) UserRepository {
 	return &UserRepo{db: db}
 }
 
-// Create створює нового користувача
+// Create new user
 func (u *UserRepo) Create(ctx context.Context, user *models.User) error {
 	if user.ID == uuid.Nil {
 		user.ID = uuid.New()
@@ -53,7 +53,7 @@ func (u *UserRepo) Create(ctx context.Context, user *models.User) error {
 	return nil
 }
 
-// Delete видаляє користувача за його ID
+// Delete user by ID
 func (u *UserRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `
 	DELETE FROM users WHERE id = $1
@@ -71,7 +71,7 @@ func (u *UserRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-// GetByEmail повертає користувача за його email
+// GetByEmail returns user by email
 func (u *UserRepo) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 	query := `
@@ -88,7 +88,7 @@ func (u *UserRepo) GetByEmail(ctx context.Context, email string) (*models.User, 
 	return &user, nil
 }
 
-// GetByID повертає користувача за його ID
+// GetByID returns user by ID
 func (u *UserRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	var user models.User
 	query := `
@@ -105,7 +105,7 @@ func (u *UserRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.User, err
 	return &user, nil
 }
 
-// List повертає список користувачів
+// List returns list of users with pagination
 func (u *UserRepo) List(ctx context.Context, limit int, offset int) ([]*models.User, error) {
 	query := `
 	SELECT id, email,password_hash, first_name, last_name, role, created_at, updated_at
@@ -123,7 +123,7 @@ func (u *UserRepo) List(ctx context.Context, limit int, offset int) ([]*models.U
 	return users, nil
 }
 
-// Update оновлює дані користувача
+// Update user information
 func (u *UserRepo) Update(ctx context.Context, user *models.User) error {
 	query := `
 	UPDATE users

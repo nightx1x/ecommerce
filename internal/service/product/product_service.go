@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
-	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	models "github.com/nightx1x/ecommerce/internal/domain"
+	repository "github.com/nightx1x/ecommerce/internal/repository/postgres"
 )
 
 type ProductService interface {

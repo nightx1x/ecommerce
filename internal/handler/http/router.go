@@ -5,12 +5,13 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
 	_ "github.com/nightx1x/ecommerce/docs"
-	authService "github.com/nightx1x/ecommerce/interval/service/auth"
-	cartService "github.com/nightx1x/ecommerce/interval/service/cart"
-	orderService "github.com/nightx1x/ecommerce/interval/service/order"
-	productService "github.com/nightx1x/ecommerce/interval/service/product"
-	userService "github.com/nightx1x/ecommerce/interval/service/user"
+	authService "github.com/nightx1x/ecommerce/internal/service/auth"
+	cartService "github.com/nightx1x/ecommerce/internal/service/cart"
+	orderService "github.com/nightx1x/ecommerce/internal/service/order"
+	productService "github.com/nightx1x/ecommerce/internal/service/product"
+	userService "github.com/nightx1x/ecommerce/internal/service/user"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -22,7 +23,6 @@ type RouterConfig struct {
 	UserService    userService.UserService
 }
 
-// створення путів
 func NewRouter(config RouterConfig) *chi.Mux {
 	r := chi.NewRouter()
 

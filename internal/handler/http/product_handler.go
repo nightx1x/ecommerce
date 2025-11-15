@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	productSrv "github.com/nightx1x/ecommerce/interval/service/product"
+	productSrv "github.com/nightx1x/ecommerce/internal/service/product"
 )
 
 type ProductHandler struct {
@@ -33,8 +33,8 @@ func (h *ProductHandler) RegisterRoutes(r chi.Router) {
 }
 
 // GetProduct godoc
-// @Summary Отримати продукт за ID
-// @Description Повертає детальну інформацію про продукт за його унікальним ідентифікатором
+// @Summary Get product by ID
+// @Description Returns detailed product information by its unique identifier
 // @Tags products
 // @Accept json
 // @Produce json
@@ -68,7 +68,8 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		Limit:  20,
 		Offset: 0,
 	}
-	//categoryID
+
+	// categoryID
 	if categoryIDStr := r.URL.Query().Get("category_id"); categoryIDStr != "" {
 		categoryID, err := uuid.Parse(categoryIDStr)
 		if err != nil {
@@ -76,7 +77,8 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		filter.CategoryID = &categoryID
 	}
-	//minPrice
+
+	// minPrice
 	if minPriceStr := r.URL.Query().Get("min_price"); minPriceStr != "" {
 		minPrice, err := strconv.ParseFloat(minPriceStr, 64)
 		if err != nil {
@@ -84,7 +86,8 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		}
 		filter.MinPrice = &minPrice
 	}
-	//maxPrice
+
+	// maxPrice
 	if maxPriceStr := r.URL.Query().Get("max_price"); maxPriceStr != "" {
 		maxPrice, err := strconv.ParseFloat(maxPriceStr, 64)
 		if err != nil {
@@ -93,16 +96,16 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		filter.MaxPrice = &maxPrice
 	}
 
-	//Search
+	// Search
 	filter.Search = r.URL.Query().Get("search")
 
-	//InStock
+	// InStock
 	if inStockStr := r.URL.Query().Get("in_stock"); inStockStr != "" {
 		instock := inStockStr == "true"
 		filter.InStock = &instock
 	}
 
-	//Limit
+	// Limit
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		limit, err := strconv.Atoi(limitStr)
 		if err != nil || limit <= 0 {
@@ -111,11 +114,11 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 		filter.Limit = limit
 	}
 
-	//Offset
+	// Offset
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		offset, err := strconv.Atoi(offsetStr)
 		if err != nil || offset < 0 {
-			respondError(w, http.StatusBadRequest, "Invalid Offset")
+			respondError(w, http.StatusBadRequest, "Invalid offset")
 		}
 		filter.Offset = offset
 	}
@@ -138,6 +141,7 @@ func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusBadRequest, "Search query is required")
 		return
 	}
+
 	limit := 20
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		l, err := strconv.Atoi(limitStr)
@@ -151,7 +155,7 @@ func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		o, err := strconv.Atoi(offsetStr)
 		if err != nil || o < 0 {
-			respondError(w, http.StatusBadRequest, "Invalid Offset")
+			respondError(w, http.StatusBadRequest, "Invalid offset")
 		}
 		offset = o
 	}

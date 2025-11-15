@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	cartSrv "github.com/nightx1x/ecommerce/interval/service/cart"
+	cartSrv "github.com/nightx1x/ecommerce/internal/service/cart"
 )
 
 type CartHandler struct {
@@ -28,13 +28,13 @@ func (h *CartHandler) RegisterRoutes(r chi.Router) {
 }
 
 // AddItem godoc
-// @Summary Додає товар у кошик
-// @Description Додає новий товар у кошик користувача
+// @Summary Adds an item to the cart
+// @Description Adds a new item to the user's cart
 // @Tags cart
 // @Accept json
 // @Produce json
-// @Param item body cart.AddCartItemRequest true "Товар для додавання"
-// @Success 201 {object} models.CartItem
+// @Param item body cart.AddCartItemRequest true "Item to add"
+// @Success 201 {object} models.Cart
 // @Failure 400 {object} http.ErrorResponse "Invalid request body or quantity"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
 // @Failure 500 {object} http.ErrorResponse "Internal server error"
@@ -61,14 +61,14 @@ func (h *CartHandler) AddItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateItem godoc
-// @Summary Оновлює товар у кошику
-// @Description Змінює кількість або товар у кошику користувача
+// @Summary Updates an item in the cart
+// @Description Changes the quantity or details of an item in the user's cart
 // @Tags cart
 // @Accept json
 // @Produce json
-// @Param id path string true "ID товару у кошику"
-// @Param item body cart.UpdateCartItemRequest true "Оновлені дані товару"
-// @Success 200 {object} models.CartItem
+// @Param id path string true "Cart item ID"
+// @Param item body cart.UpdateCartItemRequest true "Updated item data"
+// @Success 200 {object} models.Cart
 // @Failure 400 {object} http.ErrorResponse "Invalid request body or quantity"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
 // @Failure 404 {object} http.ErrorResponse "Item not found"
@@ -104,12 +104,12 @@ func (h *CartHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteItem godoc
-// @Summary Видаляє товар з кошика
-// @Description Видаляє конкретний товар з кошика користувача
+// @Summary Deletes an item from the cart
+// @Description Removes a specific item from the user's cart
 // @Tags cart
 // @Accept json
 // @Produce json
-// @Param id path string true "ID товару у кошику"
+// @Param id path string true "Cart item ID"
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} http.ErrorResponse "Invalid item ID"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
@@ -142,8 +142,8 @@ func (h *CartHandler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClearCart godoc
-// @Summary Очищає кошик
-// @Description Видаляє всі товари з кошика користувача
+// @Summary Clears the cart
+// @Description Removes all items from the user's cart
 // @Tags cart
 // @Accept json
 // @Produce json
@@ -166,13 +166,13 @@ func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusOK, map[string]string{
-		"message": "cart clear succesfully",
+		"message": "cart cleared successfully",
 	})
 }
 
 // ListItems godoc
-// @Summary Повертає список товарів у кошику
-// @Description Повертає всі товари користувача в кошику
+// @Summary Returns the list of items in the cart
+// @Description Returns all user items in the cart
 // @Tags cart
 // @Accept json
 // @Produce json

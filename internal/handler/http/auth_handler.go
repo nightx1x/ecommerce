@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	authSrv "github.com/nightx1x/ecommerce/interval/service/auth"
+	authSrv "github.com/nightx1x/ecommerce/internal/service/auth"
 )
 
 type AuthHandler struct {
@@ -25,12 +25,12 @@ func (h *AuthHandler) RegisterRoutes(r chi.Router) {
 }
 
 // Register godoc
-// @Summary Реєстрація нового користувача
-// @Description Реєструє нового користувача та повертає токени доступу
+// @Summary Registration of a new user
+// @Description Registers a new user and returns access tokens
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body auth.RegisterRequest true "Дані для реєстрації"
+// @Param user body auth.RegisterRequest true "Registration data"
 // @Success 201 {object} auth.AuthResponse
 // @Failure 400 {object} http.ErrorResponse "Invalid request body"
 // @Failure 409 {object} http.ErrorResponse "User already exists"
@@ -52,19 +52,19 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 // Login godoc
-// @Summary Логін користувача
-// @Description Логін користувача та повертає токени доступу
+// @Summary User login
+// @Description Logs in a user and returns access tokens
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body auth.LoginRequset true "Дані для логіну"
+// @Param user body auth.LoginRequest true "Login data"
 // @Success 200 {object} auth.AuthResponse
 // @Failure 400 {object} http.ErrorResponse "Invalid request body"
 // @Failure 401 {object} http.ErrorResponse "Invalid credentials"
 // @Failure 500 {object} http.ErrorResponse "Internal server error"
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	var req authSrv.LoginRequset
+	var req authSrv.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondError(w, http.StatusBadRequest, "Invalid request body")
 		return
@@ -78,8 +78,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 // RefreshToken godoc
-// @Summary Оновлення токена доступу
-// @Description Оновлює access token за допомогою refresh token
+// @Summary Refresh access token
+// @Description Refreshes access token using refresh token
 // @Tags auth
 // @Accept json
 // @Produce json

@@ -9,14 +9,14 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	models "github.com/nightx1x/ecommerce/interval/domain"
-	repository "github.com/nightx1x/ecommerce/interval/repository/postgres"
+	models "github.com/nightx1x/ecommerce/internal/domain"
+	repository "github.com/nightx1x/ecommerce/internal/repository/postgres"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
 	Register(ctx context.Context, req RegisterRequest) (*AuthResponse, error)
-	Login(ctx context.Context, req LoginRequset) (*AuthResponse, error)
+	Login(ctx context.Context, req LoginRequest) (*AuthResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*AuthResponse, error)
 	ValidateToken(tokenString string) (*Claims, error)
 }
@@ -26,7 +26,7 @@ type RegisterRequest struct {
 	FirstName string `json:"first_name" validate:"required,min=2"`
 	LastName  string `json:"last_name" validate:"required,min=2"`
 }
-type LoginRequset struct {
+type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
@@ -60,8 +60,8 @@ func NewService(authRepo repository.UserRepository, jwtSecret string) AuthServic
 	}
 }
 
-// Login авторизація користувача
-func (s *service) Login(ctx context.Context, req LoginRequset) (*AuthResponse, error) {
+// Login
+func (s *service) Login(ctx context.Context, req LoginRequest) (*AuthResponse, error) {
 
 	if req.Email == "" {
 		return nil, ErrEmailRequired
@@ -99,7 +99,7 @@ func (s *service) Login(ctx context.Context, req LoginRequset) (*AuthResponse, e
 	}, nil
 }
 
-// RefreshToken оновлення JWT токену
+// RefreshToken JWT token refresh
 func (s *service) RefreshToken(ctx context.Context, refreshToken string) (*AuthResponse, error) {
 
 	claims, err := s.ValidateToken(refreshToken)
@@ -128,7 +128,7 @@ func (s *service) RefreshToken(ctx context.Context, refreshToken string) (*AuthR
 	}, nil
 }
 
-// Register реєстрація користувача
+// Register user
 func (s *service) Register(ctx context.Context, req RegisterRequest) (*AuthResponse, error) {
 
 	if req.Email == "" {
@@ -182,7 +182,7 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (*AuthRespo
 	}, nil
 }
 
-// ValidateToken валідація токену
+// ValidateToken
 func (s *service) ValidateToken(tokenString string) (*Claims, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(t *jwt.Token) (interface{}, error) {
@@ -208,7 +208,7 @@ func (s *service) ValidateToken(tokenString string) (*Claims, error) {
 	return claims, nil
 }
 
-// generateToken генерація нового JWT токену
+// generateToken
 func (s *service) generateToken(user *models.User, duration time.Duration) (string, error) {
 
 	claims := &Claims{

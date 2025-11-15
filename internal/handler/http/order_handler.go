@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	orderSrv "github.com/nightx1x/ecommerce/interval/service/order"
+	orderSrv "github.com/nightx1x/ecommerce/internal/service/order"
 )
 
 type OrderHandler struct {
@@ -29,8 +29,8 @@ func (h *OrderHandler) RegisterRoutes(r chi.Router) {
 }
 
 // GetOrder godoc
-// @Summary Отримати замовлення за ID
-// @Description Повертає детальну інформацію про замовлення за його унікальним ідентифікатором
+// @Summary Get order by ID
+// @Description Returns detailed information about an order by its unique identifier
 // @Tags orders
 // @Accept json
 // @Produce json
@@ -58,12 +58,12 @@ func (h *OrderHandler) GetOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateOrder godoc
-// @Summary Створити замовлення
-// @Description Створює нове замовлення для авторизованого користувача
+// @Summary Create an order
+// @Description Creates a new order for the authorized user
 // @Tags orders
 // @Accept json
 // @Produce json
-// @Param order body order.CreateOrderRequest true "Дані замовлення"
+// @Param order body order.CreateOrderRequest true "Order data"
 // @Success 201 {object} models.Order
 // @Failure 400 {object} http.ErrorResponse "Invalid request body"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
@@ -93,8 +93,8 @@ func (h *OrderHandler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // CancelOrder godoc
-// @Summary Скасувати замовлення
-// @Description Скасовує замовлення за ID (якщо воно ще не доставлене)
+// @Summary Cancel an order
+// @Description Cancels an order by ID (if it has not been delivered yet)
 // @Tags orders
 // @Accept json
 // @Produce json
@@ -123,14 +123,14 @@ func (h *OrderHandler) CancelOrder(w http.ResponseWriter, r *http.Request) {
 }
 
 // ListOrder godoc
-// @Summary Отримати список замовлень
-// @Description Повертає список замовлень користувача з можливістю фільтрації за статусом та пагінацією
+// @Summary Get order list
+// @Description Returns the user's order list with optional status filtering and pagination
 // @Tags orders
 // @Accept json
 // @Produce json
-// @Param status query string false "Фільтр по статусу" Enums(pending, paid, shipped, canceled, delivered)
-// @Param limit query int false "Кількість елементів на сторінку" default(20)
-// @Param offset query int false "Зміщення для пагінації" default(0)
+// @Param status query string false "Filter by status" Enums(pending, paid, shipped, canceled, delivered)
+// @Param limit query int false "Number of items per page" default(20)
+// @Param offset query int false "Pagination offset" default(0)
 // @Success 200 {object} order.OrderListResponse
 // @Failure 400 {object} http.ErrorResponse "Invalid parameters"
 // @Failure 401 {object} http.ErrorResponse "User not authorized"
@@ -164,7 +164,7 @@ func (h *OrderHandler) ListOrder(w http.ResponseWriter, r *http.Request) {
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		offset, err := strconv.Atoi(offsetStr)
 		if err != nil || offset < 0 {
-			respondError(w, http.StatusBadRequest, "Invalid Offset")
+			respondError(w, http.StatusBadRequest, "Invalid offset")
 			return
 		}
 		filter.Offset = offset
