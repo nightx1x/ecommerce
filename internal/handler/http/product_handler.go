@@ -63,6 +63,23 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, product)
 }
 
+// ListProducts godoc
+// @Summary Get list of products
+// @Description Returns a list of products with optional filtering by category, price, availability, and pagination
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param category_id query string false "Category ID (UUID)"
+// @Param min_price query number false "Minimum price"
+// @Param max_price query number false "Maximum price"
+// @Param search query string false "Search query"
+// @Param in_stock query boolean false "Only products in stock"
+// @Param limit query integer false "Number of items per page" default(20) minimum(1) maximum(100)
+// @Param offset query integer false "Offset for pagination" default(0) minimum(0)
+// @Success 200 {object} product.ProductListResponse
+// @Failure 400 {object} ErrorResponse "Invalid parameters"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /products [get]
 func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	filter := productSrv.ProductFilter{
 		Limit:  20,
@@ -130,11 +147,33 @@ func (h *ProductHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, response)
 }
 
+// ListCategories godoc
+// @Summary Get list of categories
+// @Description Returns a list of all product categories
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {array} interface{}
+// @Failure 500 {object} http.ErrorResponse "Internal server error"
+// @Router /categories [get]
 func (h *ProductHandler) ListCategories(w http.ResponseWriter, r *http.Request) {
 	categories := []interface{}{}
 	respondJSON(w, http.StatusOK, categories)
 }
 
+// / SearchProduct godoc
+// @Summary Search products
+// @Description Returns a list of products that match the search query
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param q query string true "Search query"
+// @Param limit query integer false "Number of items per page" default(20) minimum(1) maximum(100)
+// @Param offset query integer false "Offset for pagination" default(0) minimum(0)
+// @Success 200 {array} models.Product
+// @Failure 400 {object} http.ErrorResponse "Search query is required or invalid parameters"
+// @Failure 500 {object} http.ErrorResponse "Internal server error"
+// @Router /products/search [get]
 func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
 	if query == "" {

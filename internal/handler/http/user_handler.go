@@ -46,7 +46,7 @@ func (h *UserHandler) ListUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.UserSrv.GetUser(r.Context(), userID)
 	if err != nil {
-		handlerServiceUserError(w, err)
+		HandlerServiceUserError(w, err)
 		return
 	}
 	respondJSON(w, http.StatusOK, user)
@@ -90,29 +90,8 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	updUser, err := h.UserSrv.UpdateUser(r.Context(), userID, updReq, false)
 	if err != nil {
-		handlerServiceUserError(w, err)
+		HandlerServiceUserError(w, err)
 		return
 	}
 	respondJSON(w, http.StatusOK, updUser)
-}
-
-// handlerServiceUserError returns service errors
-func handlerServiceUserError(w http.ResponseWriter, err error) {
-	switch err {
-	case userSrv.ErrUserNotFound:
-		respondError(w, http.StatusNotFound, err.Error())
-
-	case userSrv.ErrUserIDRequired,
-		userSrv.ErrInvalidEmail,
-		userSrv.ErrInvalidRole,
-		userSrv.ErrPasswordRequired,
-		userSrv.ErrNoFields:
-		respondError(w, http.StatusBadRequest, err.Error())
-
-	case userSrv.ErrEmailAlreadyExists:
-		respondError(w, http.StatusConflict, err.Error())
-
-	default:
-		respondError(w, http.StatusInternalServerError, "Internal server error")
-	}
 }

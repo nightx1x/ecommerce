@@ -220,6 +220,19 @@ definitions:
     - price
     - stock
     type: object
+  product.ProductListResponse:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/models.Product'
+        type: array
+      total:
+        type: integer
+    type: object
   product.UpdateProductRequest:
     properties:
       category_id:
@@ -881,6 +894,26 @@ paths:
       summary: Updates an item in the cart
       tags:
       - cart
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all product categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items: {}
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get list of categories
+      tags:
+      - products
   /orders:
     get:
       consumes:
@@ -1039,6 +1072,108 @@ paths:
       summary: Cancel an order
       tags:
       - orders
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of products with optional filtering by category,
+        price, availability, and pagination
+      parameters:
+      - description: Category ID (UUID)
+        in: query
+        name: category_id
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - description: Only products in stock
+        in: query
+        name: in_stock
+        type: boolean
+      - default: 20
+        description: Number of items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset for pagination
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/product.ProductListResponse'
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get list of products
+      tags:
+      - products
+  /products/search:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of products that match the search query
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 20
+        description: Number of items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset for pagination
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "400":
+          description: Search query is required or invalid parameters
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Search products
+      tags:
+      - products
   /users:
     get:
       consumes:
