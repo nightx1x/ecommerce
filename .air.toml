@@ -15,7 +15,7 @@ tmp_dir = "tmp"
   bin = "./tmp/main"
   
   # Команда збірки
-  cmd = "go build -o ./tmp/main ."
+  cmd = "go build -o ./tmp/main ./cmd/api"
   
   # Затримка після детекції зміни файлу (мілісекунди)
   delay = 1000

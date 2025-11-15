@@ -1,4 +1,4 @@
-package service
+package product
 
 import (
 	"context"
@@ -144,7 +144,7 @@ func (s *service) ReleaseStock(ctx context.Context, id uuid.UUID, quantity int) 
 	}
 
 	product.Stock += quantity
-	return s.productRepo.Update(ctx, product)
+	return s.productRepo.Update(ctx, product.ID)
 
 }
 
@@ -154,11 +154,14 @@ func (s *service) ReserveStock(ctx context.Context, id uuid.UUID, quantity int) 
 	if err != nil {
 		return err
 	}
+
 	if product.Stock < quantity {
 		return ErrInvalidStock
 	}
+
 	product.Stock -= quantity
-	return s.productRepo.Update(ctx, product)
+
+	return s.productRepo.Update(ctx, product.ID)
 
 }
 
@@ -216,7 +219,7 @@ func (s *service) UpdateProduct(ctx context.Context, id uuid.UUID, req UpdatePro
 	if req.ImageURL != nil {
 		product.ImageURL = req.ImageURL
 	}
-	err = s.productRepo.Update(ctx, product)
+	err = s.productRepo.Update(ctx, product.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update product: %w", err)
 	}

@@ -32,7 +32,21 @@ func (h *ProductHandler) RegisterRoutes(r chi.Router) {
 	})
 }
 
+// GetProduct godoc
+// @Summary Отримати продукт за ID
+// @Description Повертає детальну інформацію про продукт за його унікальним ідентифікатором
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product ID (UUID)"
+// @Success 200 {object} models.Product
+// @Failure 400 {object} ErrorResponse "Invalid product ID"
+// @Failure 404 {object} ErrorResponse "Product not found"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /products/{id} [get]
+
 // handler
+
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -203,22 +217,4 @@ func handlerServiceError(w http.ResponseWriter, err error) {
 	default:
 		respondError(w, http.StatusInternalServerError, "Internal server error")
 	}
-}
-
-func respondError(w http.ResponseWriter, status int, msg string) {
-	respondJSON(w, status, ErrorResponse{
-		Error:  msg,
-		Status: status,
-	})
-}
-
-type ErrorResponse struct {
-	Error  string `json:"error"`
-	Status int    `json:"status"`
-}
-
-func respondJSON(w http.ResponseWriter, status int, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
 }

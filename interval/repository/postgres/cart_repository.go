@@ -2,96 +2,168 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+
 	database "github.com/nightx1x/ecommerce/interval/db"
 	models "github.com/nightx1x/ecommerce/interval/domain"
 )
 
 type CartRepository interface {
-	CreateItem(ctx context.Context, cart *models.Cart) error
-	GetByID(ctx context.Context, id uuid.UUID) (*models.Cart, error)
-	UpdateItem(ctx context.Context, cart *models.Cart) error
-	DeleteItem(ctx context.Context, id uuid.UUID) error
+	AddItem(ctx context.Context, item *models.Cart) error
+	GetByUserId(ctx context.Context, userID uuid.UUID) ([]*models.CartWithProduct, error)
+	UpdateQuantity(ctx context.Context, id uuid.UUID, quantity int) error
+	RemoveItem(ctx context.Context, userID, id uuid.UUID) error
+	Clear(ctx context.Context, userId uuid.UUID) error
+	GetItem(ctx context.Context, userId, productId uuid.UUID) (*models.Cart, error)
+	GetItemByID(ctx context.Context, userID, itemID uuid.UUID) (*models.Cart, error)
 }
-type cartRepo struct {
+
+type CartRepo struct {
 	db *database.DB
 }
 
-// Create implements CartRepository.
-func (c *cartRepo) CreateItem(ctx context.Context, cart *models.Cart) error {
-	query := `
-		INSERT INTO carts (id, user_id, items, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5)
-	`
-	_, err := c.db.ExecContext(ctx, query,
-		cart.ID,
-		cart.UserID,
-		cart.Items,
-		cart.CreatedAt,
-		cart.UpdatedAt,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create cart: %w", err)
-	}
-	return nil
-}
-
-// Delete implements CartRepository.
-func (c *cartRepo) DeleteItem(ctx context.Context, id uuid.UUID) error {
-	query := `
-		DELETE FROM carts
-		WHERE id = $1
-	`
-	_, err := c.db.ExecContext(ctx, query, id)
-	if err != nil {
-		return fmt.Errorf("failed to delete cart: %w", err)
-	}
-	return nil
-}
-
-// GetByID implements CartRepository.
-func (c *cartRepo) GetByID(ctx context.Context, id uuid.UUID) (*models.Cart, error) {
-	query := `
-		SELECT id, user_id, items, created_at, updated_at
-		FROM carts
-		WHERE id = $1
-	`
-	row := c.db.QueryRowContext(ctx, query, id)
-	cart := &models.Cart{}
-	err := row.Scan(
-		&cart.ID,
-		&cart.UserID,
-		&cart.Items,
-		&cart.CreatedAt,
-		&cart.UpdatedAt,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get cart: %w", err)
-	}
-	return cart, nil
-}
-
-// Update implements CartRepository.
-func (c *cartRepo) UpdateItem(ctx context.Context, cart *models.Cart) error {
-	query := `
-		UPDATE carts
-		SET user_id = $1, items = $2, updated_at = $3
-		WHERE id = $4
-	`
-	_, err := c.db.ExecContext(ctx, query,
-		cart.UserID,
-		cart.Items,
-		cart.UpdatedAt,
-		cart.ID,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to update cart: %w", err)
-	}
-	return nil
-}
-
 func NewCartRepository(db *database.DB) CartRepository {
-	return &cartRepo{db: db}
+	return &CartRepo{db: db}
+}
+
+// AddItem додавання товарів у кошик
+func (c *CartRepo) AddItem(ctx context.Context, item *models.Cart) error {
+	query := `
+	INSERT INTO cart_items (id, user_id, product_id, quantity, created_at)
+	VALUES ($1, $2, $3, $4, NOW())
+	`
+	_, err := c.db.ExecContext(ctx, query,
+		item.ID,
+		item.UserID,
+		item.ProductID,
+		item.Quantity,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to add item: %w", err)
+	}
+
+	return nil
+}
+
+// Clear очищення кошику
+func (c *CartRepo) Clear(ctx context.Context, userId uuid.UUID) error {
+	query := `
+	DELETE FROM cart_items WHERE user_id = $1
+	`
+
+	_, err := c.db.ExecContext(ctx, query, userId)
+	if err != nil {
+		return fmt.Errorf("failed to clear cart: %w", err)
+	}
+
+	return nil
+}
+
+// GetByUserId повертає кошик за ID користувача
+func (c *CartRepo) GetByUserId(ctx context.Context, userID uuid.UUID) ([]*models.CartWithProduct, error) {
+	var items []*models.CartWithProduct
+
+	query := `
+	SELECT
+		ci.id,
+		ci.user_id,
+		ci.product_id,
+		ci.quantity,
+		ci.created_at,
+		p.name AS product_name,
+		p.price AS product_price,
+		p.stock AS product_stock
+	FROM cart_items ci
+	JOIN products p ON ci.product_id = p.id
+	WHERE ci.user_id = $1
+	`
+
+	err := c.db.SelectContext(ctx, &items, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cart items: %w", err)
+	}
+	return items, nil
+}
+
+// GetItemByID повертає товар в кошику по його ID
+func (c *CartRepo) GetItemByID(ctx context.Context, userID, itemID uuid.UUID) (*models.Cart, error) {
+	var item models.Cart
+	query := `
+	SELECT id, user_id, product_id, quantity, created_at
+	FROM cart_items
+	WHERE id = $1 AND user_id = $2
+	`
+
+	err := c.db.GetContext(ctx, &item, query, itemID, userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get item by id: %w", err)
+	}
+	return &item, nil
+}
+
+// GetItem получення товару
+func (c *CartRepo) GetItem(ctx context.Context, userId uuid.UUID, productId uuid.UUID) (*models.Cart, error) {
+	var item models.Cart
+	query := `
+	SELECT id, user_id, product_id, quantity, created_at
+	FROM cart_items
+	WHERE user_id = $1 AND product_id = $2
+	`
+
+	err := c.db.GetContext(ctx, &item, query, userId, productId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get item: %w", err)
+	}
+	return &item, nil
+}
+
+// RemoveItem видалення товару з кошика
+func (c *CartRepo) RemoveItem(ctx context.Context, userID, id uuid.UUID) error {
+	query := `
+	DELETE FROM cart_items
+	WHERE id = $1 AND user_id = $2
+	`
+
+	res, err := c.db.ExecContext(ctx, query, id, userID)
+	if err != nil {
+		return fmt.Errorf("failed to remove item: %w", err)
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("item not found")
+	}
+
+	return nil
+}
+
+// UpdateQuantity оновлення кількість товару в кошику
+func (c *CartRepo) UpdateQuantity(ctx context.Context, id uuid.UUID, quantity int) error {
+	query := `
+	UPDATE cart_items
+	SET quantity = $1
+	WHERE id = $2
+	`
+
+	res, err := c.db.ExecContext(ctx, query, quantity, id)
+	if err != nil {
+		return fmt.Errorf("failed to update quantity: %w", err)
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("cart item not found")
+	}
+
+	return nil
 }
